@@ -6,9 +6,10 @@ help: ## Show this help
 test: ## Run tests (zero dependencies, uses node:test)
 	node --test test/*.test.js
 
-zip: ## Package extension into arcsider.zip
-	@rm -f arcsider.zip
-	zip -r arcsider.zip manifest.json background.js sidepanel.html sidepanel.js sidepanel.css lib.js icons/
+zip: ## Package extension into dist/arcsider.zip
+	@mkdir -p dist
+	@rm -f dist/arcsider.zip
+	zip -r dist/arcsider.zip manifest.json background.js sidepanel.html sidepanel.js sidepanel.css lib.js assets/icons/
 
 release: ## Bump version, tag, and push (usage: make release VERSION=1.1.0)
 	@test -n "$(VERSION)" || (echo "Usage: make release VERSION=x.y.z" && exit 1)
@@ -20,4 +21,4 @@ release: ## Bump version, tag, and push (usage: make release VERSION=1.1.0)
 	git push origin main --tags
 
 clean: ## Remove build artifacts
-	rm -f arcsider.zip
+	rm -rf dist

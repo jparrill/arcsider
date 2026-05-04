@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a5a"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8a8aff"/>
+      <stop offset="100%" style="stop-color:#6a6aff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+
+  <!-- Sidebar panel shape -->
+  <rect x="80" y="80" width="200" height="352" rx="20" fill="#353565" opacity="0.8"/>
+
+  <!-- Pinned grid dots (top of sidebar) -->
+  <circle cx="128" cy="128" r="16" fill="url(#accent)"/>
+  <circle cx="176" cy="128" r="16" fill="#4ecdc4"/>
+  <circle cx="224" cy="128" r="16" fill="#ffa500"/>
+
+  <!-- Divider line -->
+  <line x1="104" y1="162" x2="256" y2="162" stroke="#4a4a7a" stroke-width="2"/>
+
+  <!-- Folder row -->
+  <rect x="104" y="178" width="148" height="28" rx="6" fill="#3a3a6a"/>
+  <text x="116" y="198" fill="#8a8aff" font-family="-apple-system, sans-serif" font-size="18" font-weight="600">▸ ▦</text>
+
+  <!-- Link rows (indented) -->
+  <rect x="120" y="214" width="132" height="24" rx="5" fill="#2a2a4a"/>
+  <circle cx="136" cy="226" r="6" fill="#6a6aff" opacity="0.6"/>
+  <rect x="148" y="222" width="80" height="8" rx="4" fill="#555577"/>
+
+  <rect x="120" y="244" width="132" height="24" rx="5" fill="#2a2a4a"/>
+  <circle cx="136" cy="256" r="6" fill="#6a6aff" opacity="0.6"/>
+  <rect x="148" y="252" width="64" height="8" rx="4" fill="#555577"/>
+
+  <!-- Second folder -->
+  <rect x="104" y="282" width="148" height="28" rx="6" fill="#3a3a6a"/>
+  <text x="116" y="302" fill="#8a8aff" font-family="-apple-system, sans-serif" font-size="18" font-weight="600">▾ ▦</text>
+
+  <!-- Nested link -->
+  <rect x="120" y="318" width="132" height="24" rx="5" fill="#2a2a4a"/>
+  <circle cx="136" cy="330" r="6" fill="#4ecdc4" opacity="0.6"/>
+  <rect x="148" y="326" width="72" height="8" rx="4" fill="#555577"/>
+
+  <!-- Right side: large "A" lettermark -->
+  <text x="300" y="360" fill="url(#accent)" font-family="-apple-system, sans-serif" font-size="240" font-weight="800" opacity="0.9">A</text>
+</svg>

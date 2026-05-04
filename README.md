@@ -82,6 +82,10 @@ If the secrets are not set, the pipeline still creates the GitHub Release — th
 └── .github/workflows/ # CI + Release pipelines
 ```
 
+## Privacy Policy
+
+Arcsider does not collect, transmit, or share any user data. All data (folders, links, pinned items) is stored locally in your browser via `chrome.storage.local` and never leaves your device. No analytics, no tracking, no external requests except for favicon loading via Google's public favicon service.
+
 ## License
 
 [MIT](LICENSE)

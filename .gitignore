@@ -1,5 +1,4 @@
 node_modules/
 dist/
-*.zip
 output.json
 .DS_Store

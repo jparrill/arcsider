@@ -38,7 +38,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: arcsider.zip
+          files: dist/arcsider.zip
           generate_release_notes: true
 
       - name: Upload to Chrome Web Store
@@ -66,7 +66,7 @@ jobs:
             -H "Authorization: Bearer ${TOKEN}" \
             -H "x-goog-api-version: 2" \
             -X PUT \
-            -T arcsider.zip \
+            -T dist/arcsider.zip \
             "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CHROME_EXTENSION_ID}")
 
           echo "$UPLOAD"
