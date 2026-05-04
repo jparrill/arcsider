@@ -35,10 +35,38 @@ Organize your links in nested folders with drag & drop, pinned shortcuts, and op
 ## Development
 
 ```bash
-make install   # install dev dependencies
-make test      # run tests
+make test      # run tests (zero dependencies, uses node:test)
 make zip       # package extension
+make help      # show all targets
 ```
+
+## Releasing
+
+1. Bump version in `manifest.json`
+2. Tag and push:
+
+```bash
+make release VERSION=1.1.0
+```
+
+This updates `manifest.json`, commits, tags `v1.1.0`, and pushes. The GitHub Actions pipeline will:
+- Run tests
+- Create a GitHub Release with `arcsider.zip` attached
+- Upload and publish to Chrome Web Store (if configured)
+
+### Chrome Web Store setup (one-time)
+
+1. Register at [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole) ($5 one-time)
+2. Upload the extension manually for the first time
+3. Create an OAuth2 client at [Google Cloud Console](https://console.cloud.google.com/apis/credentials) (Desktop app type)
+4. Get a refresh token using the [chrome-webstore-upload guide](https://github.com/nicolo-ribaudo/chrom-ext-deploy#chrome-web-store)
+5. Add these GitHub repo secrets (`Settings > Secrets > Actions`):
+   - `CHROME_CLIENT_ID`
+   - `CHROME_CLIENT_SECRET`
+   - `CHROME_REFRESH_TOKEN`
+   - `CHROME_EXTENSION_ID` (from the dashboard URL)
+
+If the secrets are not set, the pipeline still creates the GitHub Release — the Chrome Web Store step is skipped.
 
 ## Project structure
 
@@ -50,7 +78,8 @@ make zip       # package extension
 ├── sidepanel.js       # UI logic: tree, drag & drop, CRUD, import/export
 ├── lib.js             # Pure utility functions (shared with tests)
 ├── icons/             # Extension icons (16, 48, 128px)
-└── test/              # Unit tests (vitest)
+├── test/              # Unit tests (node:test, zero deps)
+└── .github/workflows/ # CI + Release pipelines
 ```
 
 ## License

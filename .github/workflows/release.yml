@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: make test
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches manifest version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          MANIFEST=$(jq -r .version manifest.json)
+          if [ "$TAG" != "$MANIFEST" ]; then
+            echo "::error::Tag v${TAG} does not match manifest version ${MANIFEST}"
+            exit 1
+          fi
+
+      - name: Package extension
+        run: make zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: arcsider.zip
+          generate_release_notes: true
+
+      - name: Upload to Chrome Web Store
+        if: env.CHROME_CLIENT_ID != ''
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+        run: |
+          # Get access token
+          TOKEN=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
+            -d "client_id=${CHROME_CLIENT_ID}" \
+            -d "client_secret=${CHROME_CLIENT_SECRET}" \
+            -d "refresh_token=${CHROME_REFRESH_TOKEN}" \
+            -d "grant_type=refresh_token" | jq -r '.access_token')
+
+          if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
+            echo "::error::Failed to get access token"
+            exit 1
+          fi
+
+          # Upload zip
+          UPLOAD=$(curl -s \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -X PUT \
+            -T arcsider.zip \
+            "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CHROME_EXTENSION_ID}")
+
+          echo "$UPLOAD"
+          STATE=$(echo "$UPLOAD" | jq -r '.uploadState')
+          if [ "$STATE" != "SUCCESS" ]; then
+            echo "::error::Upload failed: $STATE"
+            exit 1
+          fi
+
+          # Publish
+          PUBLISH=$(curl -s \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -H "Content-Length: 0" \
+            -X POST \
+            "https://www.googleapis.com/chromewebstore/v1.1/items/${CHROME_EXTENSION_ID}/publish")
+
+          echo "$PUBLISH"
+          echo "::notice::Published to Chrome Web Store"
