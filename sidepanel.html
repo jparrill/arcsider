@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcsider</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="sidebar">
+    <div class="header">
+      <div class="header-title">Sidebar</div>
+      <div class="header-actions">
+        <button id="btn-add-folder" title="New folder">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 3.5A1.5 1.5 0 012.5 2h3.379a1.5 1.5 0 011.06.44L8.062 3.56A.5.5 0 008.415 3.7H13.5A1.5 1.5 0 0115 5.2v7.3a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 9h6M8 6v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+        <button id="btn-fold-all" title="Collapse all">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4-4 4 4M4 10l4 4 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="btn-add-link" title="Add current tab">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <span class="header-sep"></span>
+        <button id="btn-export" title="Export">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M4 6l4-4 4 4M3 11v2h10v-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="btn-import" title="Import Arcsider JSON">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 10V2M4 6l4 4 4-4M3 11v2h10v-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="btn-import-arc" title="Import from Arc Browser">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 110 14A7 7 0 018 1z" stroke="currentColor" stroke-width="1.2"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none">
+        <input type="file" id="import-arc-file" accept=".json" style="display:none">
+      </div>
+    </div>
+    <div id="pinned-grid" class="pinned-grid"></div>
+    <div class="section-divider"></div>
+    <div id="tree" class="tree"></div>
+    <div class="section-divider"></div>
+    <div class="section-label">Open tabs</div>
+    <div id="open-tabs" class="open-tabs"></div>
+  </div>
+  <div id="context-menu" class="context-menu hidden">
+    <button data-action="pin">Pin to top</button>
+    <button data-action="unpin">Unpin</button>
+    <button data-action="edit-link">Edit</button>
+    <button data-action="edit-folder">Rename</button>
+    <button data-action="add-subfolder">Add subfolder</button>
+    <button data-action="add-link">Add link here</button>
+    <button data-action="delete">Delete</button>
+  </div>
+  <script src="lib.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

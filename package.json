@@ -1,0 +1,11 @@
+{
+  "name": "arcsider",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Arc-like sidebar extension for Chromium browsers",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "author": "Juan Manuel Parrilla Madrid",
+  "license": "MIT"
+}
