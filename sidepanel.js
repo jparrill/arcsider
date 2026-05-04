@@ -955,6 +955,170 @@ function showAddLinkForm(parentNode) {
   urlInput.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 }
 
+// ── Folder dropdown helper ──
+
+function collectFolderOptions(nodes, path = '') {
+  const options = [];
+  for (const node of nodes) {
+    if (node.type === 'folder') {
+      const label = path ? `${path} / ${node.name}` : node.name;
+      options.push({ id: node.id, label });
+      if (node.children) {
+        options.push(...collectFolderOptions(node.children, label));
+      }
+    }
+  }
+  return options;
+}
+
+function folderSelectHtml(selectedId) {
+  const folders = collectFolderOptions(tree);
+  const opts = folders.map(f =>
+    `<option value="${f.id}"${f.id === selectedId ? ' selected' : ''}>${f.label}</option>`
+  ).join('');
+  return `<option value="">(Top level)</option>${opts}`;
+}
+
+// ── Context menu forms (triggered from background.js) ──
+
+function showContextAddLinkForm(prefillTitle, prefillUrl) {
+  let overlay = document.getElementById('form-overlay');
+  if (overlay) overlay.remove();
+
+  overlay = document.createElement('div');
+  overlay.id = 'form-overlay';
+  overlay.className = 'form-overlay';
+  overlay.innerHTML = `
+    <div class="form-dialog">
+      <div class="form-title">Add page to Arcsider</div>
+      <label class="form-label">Name</label>
+      <input type="text" id="form-ctx-name" class="form-input" value="${(prefillTitle || '').replace(/"/g, '&quot;')}">
+      <label class="form-label">URL</label>
+      <input type="text" id="form-ctx-url" class="form-input" value="${(prefillUrl || '').replace(/"/g, '&quot;')}">
+      <label class="form-label">Folder</label>
+      <select id="form-ctx-folder" class="form-input">${folderSelectHtml()}</select>
+      <div class="form-buttons">
+        <button id="form-cancel" class="form-btn form-btn-cancel">Cancel</button>
+        <button id="form-save" class="form-btn form-btn-save">Add</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const nameInput = document.getElementById('form-ctx-name');
+  const urlInput = document.getElementById('form-ctx-url');
+  const folderSelect = document.getElementById('form-ctx-folder');
+  nameInput.focus();
+  nameInput.select();
+
+  const close = () => overlay.remove();
+
+  const submit = () => {
+    const name = nameInput.value.trim();
+    const url = normalizeUrl(urlInput.value.trim());
+    if (!name || !url) return;
+    const newLink = { id: generateId(), type: 'link', title: name, url };
+    const folderId = folderSelect.value;
+    if (folderId) {
+      const folder = findNode(tree, folderId);
+      if (folder) {
+        if (!folder.children) folder.children = [];
+        folder.children.push(newLink);
+        folder.expanded = true;
+      } else {
+        tree.push(newLink);
+      }
+    } else {
+      tree.push(newLink);
+    }
+    save();
+    render();
+    close();
+  };
+
+  document.getElementById('form-cancel').addEventListener('click', close);
+  document.getElementById('form-save').addEventListener('click', submit);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') urlInput.focus();
+    if (e.key === 'Escape') close();
+  });
+  urlInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submit();
+    if (e.key === 'Escape') close();
+  });
+}
+
+function showContextAddFolderForm() {
+  let overlay = document.getElementById('form-overlay');
+  if (overlay) overlay.remove();
+
+  overlay = document.createElement('div');
+  overlay.id = 'form-overlay';
+  overlay.className = 'form-overlay';
+  overlay.innerHTML = `
+    <div class="form-dialog">
+      <div class="form-title">New folder</div>
+      <label class="form-label">Name</label>
+      <input type="text" id="form-ctx-folder-name" class="form-input" placeholder="Folder name" autofocus>
+      <label class="form-label">Nest inside</label>
+      <select id="form-ctx-parent" class="form-input">${folderSelectHtml()}</select>
+      <div class="form-buttons">
+        <button id="form-cancel" class="form-btn form-btn-cancel">Cancel</button>
+        <button id="form-save" class="form-btn form-btn-save">Create</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const nameInput = document.getElementById('form-ctx-folder-name');
+  const parentSelect = document.getElementById('form-ctx-parent');
+  nameInput.focus();
+
+  const close = () => overlay.remove();
+
+  const submit = () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    const newFolder = { id: generateId(), type: 'folder', name, children: [], expanded: true };
+    const parentId = parentSelect.value;
+    if (parentId) {
+      const parent = findNode(tree, parentId);
+      if (parent) {
+        if (!parent.children) parent.children = [];
+        parent.children.push(newFolder);
+        parent.expanded = true;
+      } else {
+        tree.push(newFolder);
+      }
+    } else {
+      tree.push(newFolder);
+    }
+    save();
+    render();
+    close();
+  };
+
+  document.getElementById('form-cancel').addEventListener('click', close);
+  document.getElementById('form-save').addEventListener('click', submit);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  nameInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submit();
+    if (e.key === 'Escape') close();
+  });
+}
+
+// ── Message listener (from background.js context menu) ──
+
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.action !== 'show-add-form') return;
+  if (msg.type === 'link') {
+    showContextAddLinkForm(msg.title, msg.url);
+  } else if (msg.type === 'folder') {
+    showContextAddFolderForm();
+  }
+});
+
 // ── Init ──
 
 load().then(render);
